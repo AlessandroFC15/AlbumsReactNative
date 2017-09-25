@@ -7,9 +7,10 @@
 import React, {Component} from 'react';
 import {
     AppRegistry,
-    ActivityIndicator
+    ActivityIndicator,
+    View
 } from 'react-native';
-import {Container, Content} from 'native-base';
+import {Container, Content, Root, Toast, Button, Text} from 'native-base';
 
 import CenteredHeader from './src/components/CenteredHeader'
 import AlbumsList from './src/components/AlbumsList'
@@ -49,8 +50,8 @@ export default class App extends Component {
 
         this.state = {
             loading: true,
-            albums: albumsList
-        }
+            albums: []
+        };
     }
 
     static shuffle (array) {
@@ -68,7 +69,11 @@ export default class App extends Component {
         return array;
     }
 
-    componentWillMount() {
+    getDataFromApi() {
+        this.setState({
+            loading: true
+        });
+
         fetch('https://rallycoding.herokuapp.com/api/music_albums')
             .then((response) => response.json())
             .then((responseJson) => {
@@ -77,28 +82,56 @@ export default class App extends Component {
                         key: album.title,
                         albumName: album.title,
                         artistName: album.artist,
-                        artistPicture: album.image,
-                        albumPicture: album.thumbnail_image,
+                        artistPicture: album.thumbnail_image,
+                        albumPicture: album.image,
                         albumLink: "https://en.wikipedia.org/",
                     }
                 });
 
                 this.setState((prevState) => ({
-                    albums: App.shuffle(prevState.albums.concat(albumsData))
+                    albums: App.shuffle(prevState.albums.concat(albumsData)),
+                    loading: false
                 }));
-
+            })
+            .catch((error) => {
                 this.setState({
                     loading: false
                 });
+
+                console.log(error);
+
+                Toast.show({
+                    text: 'Internet unavailable!',
+                    position: 'bottom',
+                    buttonText: 'Ok',
+                    type: 'danger',
+                    duration: 3000
+                });
             });
+    }
+
+    componentWillMount() {
+        this.getDataFromApi();
     }
 
     renderMainContent() {
         if (this.state.loading) {
             return this.renderLoadingScreen();
+        } else if (this.state.albums.length === 0){
+            return this.renderErrorScreen();
         } else {
             return this.renderAlbumsList();
         }
+    }
+
+    renderErrorScreen() {
+        return (
+            <View>
+                <Button block light onPress={() => this.getDataFromApi()}>
+                    <Text>Tentar novamente</Text>
+                </Button>
+            </View>
+        )
     }
 
     renderLoadingScreen() {
@@ -111,13 +144,15 @@ export default class App extends Component {
 
     render() {
         return (
-            <Container>
-                <CenteredHeader text="Albums"/>
+            <Root>
+                <Container>
+                    <CenteredHeader text="Albums"/>
 
-                <Content padder>
-                    {this.renderMainContent()}
-                </Content>
-            </Container>
+                    <Content padder>
+                        {this.renderMainContent()}
+                    </Content>
+                </Container>
+            </Root>
         );
     }
 }
