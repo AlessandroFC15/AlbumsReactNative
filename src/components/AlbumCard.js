@@ -4,24 +4,26 @@ import { Button, Card, CardItem, Left, Body, Text, Thumbnail} from 'native-base'
 
 class AlbumCard extends Component {
     render() {
+        const { artistPicture, albumName, artistName, albumPicture, albumLink} = this.props.data
+
         return (
             <View style={{ marginTop: 5, marginBottom: 5 }}>
                 <Card>
                     <CardItem>
                         <Left>
-                            <Thumbnail source={{uri: this.props.data.artistPicture}} />
+                            <Thumbnail source={{uri: artistPicture}} />
                             <Body>
-                            <Text>{this.props.data.albumName}</Text>
-                            <Text note>{this.props.data.artistName}</Text>
+                            <Text>{albumName}</Text>
+                            <Text note>{artistName}</Text>
                             </Body>
                         </Left>
                     </CardItem>
 
                     <CardItem cardBody>
-                        <Image source={{uri: this.props.data.albumPicture}} style={{height: 350, width: null, flex: 1}}/>
+                        <Image source={{uri: albumPicture}} style={{height: 350, width: null, flex: 1}}/>
                     </CardItem>
 
-                    <Button full info onPress={() => Linking.openURL(this.props.data.albumLink).catch(err => Alert.alert(err)) }>
+                    <Button full info onPress={() => Linking.openURL(albumLink).catch(err => Alert.alert(err)) }>
                         <Text>Buy Now</Text>
                     </Button>
                 </Card>
