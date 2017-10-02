@@ -24,7 +24,7 @@ class AlbumCard extends Component {
                     </CardItem>
 
                     <Button full info onPress={() => Linking.openURL(albumLink).catch(err => Alert.alert(err)) }>
-                        <Text>Buy Now</Text>
+                        <Text>Buy now</Text>
                     </Button>
                 </Card>
             </View>
